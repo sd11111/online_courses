@@ -1,0 +1,236 @@
+.container {
+    width: 100%;
+  }
+  
+  .header {
+    margin-bottom: 2rem;
+  }
+  
+  .header h1 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .statCard {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
+  
+  .statCard h3 {
+    font-size: 1rem;
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .statValue {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+  }
+  
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 2rem;
+  }
+  
+  .tab {
+    padding: 0.8rem 1.5rem;
+    margin-right: 0.5rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .tab:hover {
+    color: #0070f3;
+  }
+  
+  .tab.active {
+    color: #0070f3;
+    border-bottom-color: #0070f3;
+  }
+  
+  .usersList, .coursesList {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .userHeader, .courseHeader {
+    display: grid;
+    padding: 1rem;
+    font-weight: 600;
+    color: #666;
+    background-color: #f8f9fa;
+  }
+  
+  .userHeader {
+    grid-template-columns: 1.5fr 2fr 1fr 1.5fr 1.5fr;
+  }
+  
+  .courseHeader {
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+  }
+  
+  .userRow, .courseRow {
+    display: grid;
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    align-items: center;
+  }
+  
+  .userRow {
+    grid-template-columns: 1.5fr 2fr 1fr 1.5fr 1.5fr;
+  }
+  
+  .courseRow {
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+  }
+  
+  .userRow:hover, .courseRow:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .userName, .courseTitle {
+    font-weight: 500;
+  }
+  
+  .courseTitle a {
+    color: #0070f3;
+    text-decoration: none;
+  }
+  
+  .courseTitle a:hover {
+    text-decoration: underline;
+  }
+  
+  .userEmail, .courseCreator {
+    color: #666;
+  }
+  
+  .userRole, .courseStatus {
+    display: flex;
+  }
+  
+  .role-student, .role-teacher, .role-admin, .published, .draft {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .role-student {
+    background-color: #e0f2fe;
+    color: #0369a1;
+  }
+  
+  .role-teacher {
+    background-color: #dcfce7;
+    color: #15803d;
+  }
+  
+  .role-admin {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  
+  .published {
+    background-color: #dcfce7;
+    color: #15803d;
+  }
+  
+  .draft {
+    background-color: #f3f4f6;
+    color: #6b7280;
+  }
+  
+  .userCreated {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .roleSelect {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  
+  .viewButton {
+    display: inline-block;
+    background-color: #0070f3;
+    color: white;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+  }
+  
+  .viewButton:hover {
+    background-color: #0060df;
+  }
+  
+  /* Адаптивность для мобильных устройств */
+  @media (max-width: 768px) {
+    .userHeader, .courseHeader {
+      display: none;
+    }
+  
+    .userRow, .courseRow {
+      display: block;
+      padding: 1rem;
+      border-top: 1px solid #eee;
+    }
+  
+    .userRow > div, .courseRow > div {
+      margin-bottom: 0.5rem;
+    }
+  
+    .userRow > div::before, .courseRow > div::before {
+      content: attr(data-label);
+      font-weight: 600;
+      display: inline-block;
+      width: 120px;
+    }
+  
+    .userActions, .courseActions {
+      margin-top: 1rem;
+    }
+  }

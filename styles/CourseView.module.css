@@ -1,0 +1,287 @@
+.container {
+    width: 100%;
+  }
+  
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+    color: #666;
+  }
+  
+  .error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .courseHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .courseInfo {
+    flex: 1;
+  }
+  
+  .courseTitle {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .courseDetails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  
+  .courseAuthor {
+    color: #666;
+  }
+  
+  .courseAuthor span {
+    font-weight: 500;
+  }
+  
+  .courseStats {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .courseStat {
+    color: #666;
+  }
+  
+  .courseStat span {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .courseActions {
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .courseContent {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+  
+  .courseMainContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .courseDescription h2,
+  .courseLessons h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .descriptionText {
+    color: #555;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+  
+  .lessonsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .lessonItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .lessonItem:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .lessonOrder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    background-color: #0070f3;
+    color: white;
+    font-weight: 500;
+    border-radius: 50%;
+  }
+  
+  .lessonTitle {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .courseSidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .courseCard {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    position: sticky;
+    top: 20px;
+  }
+  
+  .courseImage {
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    overflow: hidden;
+  }
+  
+  .courseImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .placeholderImage {
+    font-size: 4rem;
+    color: #ccc;
+  }
+  
+  .coursePrice {
+    padding: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+  }
+  
+  .sidebarActions {
+    padding: 1rem;
+  }
+  
+  .enrollButton, .loginButton, .startLearningButton {
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    display: block;
+  }
+  
+  .enrollButton {
+    background-color: #0070f3;
+    color: white;
+  }
+  
+  .enrollButton:hover:not(:disabled) {
+    background-color: #0060df;
+  }
+  
+  .enrollButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .loginButton {
+    background-color: #4b5563;
+    color: white;
+  }
+  
+  .loginButton:hover {
+    background-color: #374151;
+  }
+  
+  .startLearningButton {
+    background-color: #10b981;
+    color: white;
+    margin-top: 0.5rem;
+  }
+  
+  .startLearningButton:hover {
+    background-color: #059669;
+  }
+  
+  .enrollmentPrompt {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .enrollmentPrompt p {
+    margin-bottom: 0.5rem;
+    color: #666;
+  }
+  
+  .statusPending, .statusApproved, .statusCompleted {
+    padding: 0.8rem;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .statusPending {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  
+  .statusApproved {
+    background-color: #dcfce7;
+    color: #15803d;
+  }
+  
+  .statusCompleted {
+    background-color: #e0f2fe;
+    color: #0369a1;
+  }
+  
+  /* Адаптивность для мобильных устройств */
+  @media (max-width: 768px) {
+    .courseHeader {
+      flex-direction: column;
+    }
+    
+    .courseActions {
+      width: 100%;
+      margin-top: 1rem;
+    }
+    
+    .courseContent {
+      grid-template-columns: 1fr;
+    }
+    
+    .courseSidebar {
+      order: -1;
+      margin-bottom: 1.5rem;
+    }
+    
+    .courseCard {
+      position: static;
+    }
+  }

@@ -1,0 +1,218 @@
+.container {
+    width: 100%;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .header h1 {
+    font-size: 1.8rem;
+    color: #333;
+    margin: 0;
+  }
+  
+  .createButton {
+    display: inline-block;
+    background-color: #0070f3;
+    color: white;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  
+  .createButton:hover {
+    background-color: #0060df;
+  }
+  
+  .error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .statsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .statsCard {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
+  
+  .statsCard h3 {
+    font-size: 1rem;
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .statValue {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  .coursesList {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .courseHeader {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    font-weight: 600;
+    color: #666;
+  }
+  
+  .courseRow {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    align-items: center;
+  }
+  
+  .courseRow:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .courseTitle a {
+    color: #0070f3;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .courseTitle a:hover {
+    text-decoration: underline;
+  }
+  
+  .published {
+    display: inline-block;
+    background-color: #dcfce7;
+    color: #15803d;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .draft {
+    display: inline-block;
+    background-color: #f3f4f6;
+    color: #6b7280;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .editButton, .publishButton, .unpublishButton, .deleteButton {
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+    font-weight: 500;
+    display: inline-block;
+  }
+  
+  .editButton {
+    color: #0070f3;
+    text-decoration: none;
+  }
+  
+  .editButton:hover {
+    background-color: rgba(0, 112, 243, 0.1);
+  }
+  
+  .publishButton {
+    color: #15803d;
+  }
+  
+  .publishButton:hover {
+    background-color: rgba(21, 128, 61, 0.1);
+  }
+  
+  .unpublishButton {
+    color: #6b7280;
+  }
+  
+  .unpublishButton:hover {
+    background-color: rgba(107, 114, 128, 0.1);
+  }
+  
+  .deleteButton {
+    color: #b91c1c;
+  }
+  
+  .deleteButton:hover {
+    background-color: rgba(185, 28, 28, 0.1);
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+  }
+  
+  .emptyCourses {
+    text-align: center;
+    padding: 3rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .emptyCourses p {
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+  
+  /* Адаптивность для мобильных устройств */
+  @media (max-width: 768px) {
+    .courseHeader {
+      display: none;
+    }
+  
+    .courseRow {
+      display: block;
+      padding: 1rem;
+      border-top: 1px solid #eee;
+    }
+  
+    .courseRow > div {
+      margin-bottom: 0.5rem;
+    }
+  
+    .courseRow > div:last-child {
+      margin-bottom: 0;
+    }
+  
+    .courseActions {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  }

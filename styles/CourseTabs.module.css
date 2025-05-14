@@ -1,0 +1,174 @@
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 2rem;
+  }
+  
+  .tab {
+    padding: 0.8rem 1.5rem;
+    margin-right: 0.5rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .tab:hover {
+    color: #0070f3;
+  }
+  
+  .tab.active {
+    color: #0070f3;
+    border-bottom-color: #0070f3;
+  }
+  
+  .lessonsContainer {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+  }
+  
+  .lessonsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .lessonsHeader h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #333;
+  }
+  
+  .addLessonButton {
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .addLessonButton:hover {
+    background-color: #0060df;
+  }
+  
+  .emptyLessons {
+    text-align: center;
+    padding: 3rem 0;
+  }
+  
+  .emptyLessons p {
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+  
+  .lessonsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .lessonItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .lessonItem:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .lessonInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .lessonOrder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    background-color: #0070f3;
+    color: white;
+    font-weight: 500;
+    border-radius: 50%;
+  }
+  
+  .lessonTitle {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .lessonActions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .editLessonButton {
+    background: none;
+    border: none;
+    color: #0070f3;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .editLessonButton:hover {
+    background-color: rgba(0, 112, 243, 0.1);
+  }
+  
+  .deleteLessonButton {
+    background: none;
+    border: none;
+    color: #e53e3e;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .deleteLessonButton:hover {
+    background-color: rgba(229, 62, 62, 0.1);
+  }
+  
+  /* Адаптивность для мобильных устройств */
+  @media (max-width: 768px) {
+    .lessonsHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .lessonsContainer {
+      padding: 1.5rem;
+    }
+    
+    .lessonItem {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .lessonActions {
+      align-self: flex-end;
+    }
+  }

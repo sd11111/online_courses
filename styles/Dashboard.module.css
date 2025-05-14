@@ -1,0 +1,211 @@
+.container {
+    width: 100%;
+  }
+  
+  .loading, .error {
+    text-align: center;
+    padding: 3rem 0;
+    color: #666;
+    font-size: 1.1rem;
+  }
+  
+  .error {
+    color: #b91c1c;
+  }
+  
+  .dashboardHeader {
+    margin-bottom: 2rem;
+  }
+  
+  .dashboardHeader h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .dashboardHeader p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+  
+  .dashboardSection {
+    margin-bottom: 3rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+  }
+  
+  .dashboardSection h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .emptyState {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  
+  .emptyState p {
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+  
+  .actionButton {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  
+  .actionButton:hover {
+    background-color: #0060df;
+  }
+  
+  .enrollmentsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .enrollmentCard {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .enrollmentCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .enrollmentImage {
+    height: 150px;
+    overflow: hidden;
+  }
+  
+  .enrollmentImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .placeholderImage {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #ccc;
+    background-color: #eee;
+  }
+  
+  .enrollmentContent {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .enrollmentTitle {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .enrollmentTitle a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .enrollmentTitle a:hover {
+    color: #0070f3;
+  }
+  
+  .enrollmentInstructor {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  
+  .enrollmentDescription {
+    color: #666;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    flex: 1;
+  }
+  
+  .enrollmentFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+  }
+  
+  .enrollmentStatus {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .enrollmentButton {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #0070f3;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .enrollmentButton:hover {
+    background-color: #0060df;
+  }
+  
+  .profileCard {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+  
+  .profileDetail {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+  
+  .profileDetail strong {
+    display: inline-block;
+    width: 100px;
+    color: #555;
+  }
+  
+  .profileActions {
+    margin-top: 1.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    .dashboardHeader h1 {
+      font-size: 1.7rem;
+    }
+    
+    .enrollmentsGrid {
+      grid-template-columns: 1fr;
+    }
+    
+    .dashboardSection {
+      padding: 1rem;
+    }
+  }
