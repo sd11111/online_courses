@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Layout from '../../../components/Layout';
 import { useAuthStore } from '../../../store/auth';
-import styles from '../../../../../styles/CourseForm.module.css';
+import styles from '../../../styles/CourseForm.module.css';
 
-// Типы контента
-enum ContentType {
+// Типы контента урока
+export enum ContentType {
   TEXT = 'TEXT',
   VIDEO = 'VIDEO',
   IMAGE = 'IMAGE',
@@ -16,361 +16,283 @@ enum ContentType {
   EMBED = 'EMBED',
 }
 
-// Схема валидации формы
-const lessonSchema = z.object({
-  title: z.string().min(3, 'Название должно содержать не менее 3 символов'),
-  contentType: z.nativeEnum(ContentType),
-  content: z.string().min(1, 'Содержание не может быть пустым'),
-  mediaUrl: z.string().url('Введите корректный URL').optional().or(z.literal('')),
-  order: z.coerce.number().min(1, 'Порядок должен быть не менее 1').nonnegative('Порядок не может быть отрицательным')
+// Схемы валидации
+const courseSchema = z.object({
+  title: z.string().min(5, 'Название курса должно содержать не менее 5 символов'),
+  description: z.string().min(20, 'Описание курса должно содержать не менее 20 символов'),
+  price: z.coerce.number().min(0, 'Цена не может быть отрицательной').optional(),
+  imageUrl: z.string().url('Введите корректный URL изображения').optional().or(z.literal('')),
+  lessons: z.array(
+    z.object({
+      title: z.string().min(3, 'Название урока должно содержать не менее 3 символов'),
+      contentType: z.nativeEnum(ContentType),
+      content: z.string().min(1, 'Содержание не может быть пустым'),
+      mediaUrl: z.string().url('Введите корректный URL').optional().or(z.literal('')),
+      order: z.coerce.number().min(1, 'Порядок должен быть не менее 1'),
+    })
+  ).optional(),
 });
 
-type LessonFormData = z.infer<typeof lessonSchema>;
+type CourseFormData = z.infer<typeof courseSchema>;
 
-export default function NewLesson() {
+export default function NewCoursePage() {
   const router = useRouter();
-  const { id: courseId } = router.query;
   const { user, isLoading: authLoading } = useAuthStore();
   
+  // Состояния
+  const [activeTab, setActiveTab] = useState<'course-info' | 'lessons'>('course-info');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [maxOrder, setMaxOrder] = useState(0);
-  
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<LessonFormData>({
-    resolver: zodResolver(lessonSchema),
+
+  // Форма для курса
+  const { 
+    register, 
+    handleSubmit, 
+    formState: { errors },
+    watch,
+    setValue,
+    trigger,
+  } = useForm<CourseFormData>({
+    resolver: zodResolver(courseSchema),
     defaultValues: {
       title: '',
-      contentType: ContentType.TEXT,
-      content: '',
-      mediaUrl: '',
-      order: 1,
+      description: '',
+      price: 0,
+      imageUrl: '',
+      lessons: [],
     },
   });
 
-  // Наблюдаем за выбранным типом контента
-  const selectedContentType = watch('contentType');
-
-  // Проверка роли пользователя
-  useEffect(() => {
-    if (!authLoading && (!user || user.role !== 'TEACHER')) {
-      router.push('/login');
-    }
-  }, [user, authLoading, router]);
-
-  // Получение информации о максимальном порядке уроков
-  useEffect(() => {
-    const fetchCourse = async () => {
-      if (!courseId || !user) return;
-      
-      try {
-        const response = await fetch(`/api/teacher/courses/${courseId}`);
-        
-        if (!response.ok) {
-          throw new Error('Не удалось загрузить информацию о курсе');
-        }
-
-        const data = await response.json();
-        
-        // Находим максимальный порядок уроков
-        const lessons = data.course.lessons || [];
-        const maxOrderValue = lessons.length > 0
-          ? Math.max(...lessons.map((lesson: any) => lesson.order))
-          : 0;
-        
-        setMaxOrder(maxOrderValue);
-        // Устанавливаем порядок следующего урока
-        setValue('order', maxOrderValue + 1);
-      } catch (error) {
-        console.error('Error fetching course:', error);
-        setError('Произошла ошибка при загрузке информации о курсе');
-      }
-    };
-
-    if (courseId && user) {
-      fetchCourse();
-    }
-  }, [courseId, user, setValue]);
-
-  const onSubmit = async (data: LessonFormData) => {
-    if (!courseId) return;
-    
+  // Обработчик создания курса
+  const onSubmit = async (data: CourseFormData) => {
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/teacher/courses/${courseId}/lessons`, {
+      const response = await fetch('/api/teacher/courses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          price: data.price || 0,
+          imageUrl: data.imageUrl || null,
+          lessons: data.lessons || [],
+        }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Не удалось создать урок');
+        throw new Error(result.error || 'Не удалось создать курс');
       }
 
-      // Перенаправляем на страницу редактирования курса
-      router.push(`/teacher/courses/${courseId}`);
+      // Переход на страницу курса
+      router.push(`/teacher/courses/${result.course.id}`);
     } catch (error) {
-      console.error('Error creating lesson:', error);
+      console.error('Error creating course:', error);
       setError((error as Error).message);
       setIsSubmitting(false);
     }
   };
 
-  if (authLoading) {
+  // Добавление урока
+  const addLesson = () => {
+    const currentLessons = watch('lessons') || [];
+    const newLesson = {
+      title: '',
+      contentType: ContentType.TEXT,
+      content: '',
+      mediaUrl: '',
+      order: currentLessons.length + 1,
+    };
+
+    setValue('lessons', [...currentLessons, newLesson]);
+  };
+
+  // Удаление урока
+  const removeLesson = (index: number) => {
+    const currentLessons = watch('lessons') || [];
+    const updatedLessons = currentLessons.filter((_, i) => i !== index);
+    
+    // Обновляем порядок уроков
+    const reorderedLessons = updatedLessons.map((lesson, idx) => ({
+      ...lesson,
+      order: idx + 1,
+    }));
+
+    setValue('lessons', reorderedLessons);
+  };
+
+  // Проверка роли пользователя
+  if (authLoading || !user || user.role !== 'TEACHER') {
     return <div>Загрузка...</div>;
   }
-
-  if (!user || user.role !== 'TEACHER') {
-    return null; // Router will redirect
-  }
-
-  // Рендер полей в зависимости от выбранного типа контента
-  const renderContentFields = () => {
-    switch (selectedContentType) {
-      case ContentType.TEXT:
-        return (
-          <div className={styles.formGroup}>
-            <label htmlFor="content">Текстовое содержание урока*</label>
-            <textarea
-              id="content"
-              placeholder="Введите содержание урока"
-              {...register('content')}
-              className={styles.textarea}
-              rows={10}
-            />
-            {errors.content && (
-              <span className={styles.errorMessage}>{errors.content.message}</span>
-            )}
-          </div>
-        );
-      
-      case ContentType.VIDEO:
-        return (
-          <>
-            <div className={styles.formGroup}>
-              <label htmlFor="mediaUrl">URL видео*</label>
-              <input
-                id="mediaUrl"
-                type="text"
-                placeholder="https://www.youtube.com/watch?v=..."
-                {...register('mediaUrl')}
-                className={styles.input}
-              />
-              {errors.mediaUrl && (
-                <span className={styles.errorMessage}>{errors.mediaUrl.message}</span>
-              )}
-              <span className={styles.helperText}>
-                Поддерживаются ссылки на YouTube, Vimeo и другие видеохостинги
-              </span>
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="content">Описание видео</label>
-              <textarea
-                id="content"
-                placeholder="Введите описание видео или дополнительные материалы"
-                {...register('content')}
-                className={styles.textarea}
-                rows={5}
-              />
-              {errors.content && (
-                <span className={styles.errorMessage}>{errors.content.message}</span>
-              )}
-            </div>
-          </>
-        );
-      
-      case ContentType.IMAGE:
-        return (
-          <>
-            <div className={styles.formGroup}>
-              <label htmlFor="mediaUrl">URL изображения*</label>
-              <input
-                id="mediaUrl"
-                type="text"
-                placeholder="https://example.com/image.jpg"
-                {...register('mediaUrl')}
-                className={styles.input}
-              />
-              {errors.mediaUrl && (
-                <span className={styles.errorMessage}>{errors.mediaUrl.message}</span>
-              )}
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="content">Описание изображения</label>
-              <textarea
-                id="content"
-                placeholder="Введите описание изображения или пояснения к нему"
-                {...register('content')}
-                className={styles.textarea}
-                rows={5}
-              />
-              {errors.content && (
-                <span className={styles.errorMessage}>{errors.content.message}</span>
-              )}
-            </div>
-          </>
-        );
-      
-      case ContentType.FILE:
-        return (
-          <>
-            <div className={styles.formGroup}>
-              <label htmlFor="mediaUrl">URL файла*</label>
-              <input
-                id="mediaUrl"
-                type="text"
-                placeholder="https://example.com/document.pdf"
-                {...register('mediaUrl')}
-                className={styles.input}
-              />
-              {errors.mediaUrl && (
-                <span className={styles.errorMessage}>{errors.mediaUrl.message}</span>
-              )}
-              <span className={styles.helperText}>
-                Укажите ссылку на файл (PDF, DOCX, XLSX и т.д.)
-              </span>
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="content">Описание файла</label>
-              <textarea
-                id="content"
-                placeholder="Введите описание файла или инструкции по его использованию"
-                {...register('content')}
-                className={styles.textarea}
-                rows={5}
-              />
-              {errors.content && (
-                <span className={styles.errorMessage}>{errors.content.message}</span>
-              )}
-            </div>
-          </>
-        );
-      
-      case ContentType.EMBED:
-        return (
-          <>
-            <div className={styles.formGroup}>
-              <label htmlFor="mediaUrl">URL для встраивания*</label>
-              <input
-                id="mediaUrl"
-                type="text"
-                placeholder="https://example.com/embed"
-                {...register('mediaUrl')}
-                className={styles.input}
-              />
-              {errors.mediaUrl && (
-                <span className={styles.errorMessage}>{errors.mediaUrl.message}</span>
-              )}
-              <span className={styles.helperText}>
-                Укажите ссылку для встраивания внешнего контента (iframe)
-              </span>
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="content">HTML-код для встраивания*</label>
-              <textarea
-                id="content"
-                placeholder="<iframe src='...'></iframe>"
-                {...register('content')}
-                className={styles.textarea}
-                rows={5}
-              />
-              {errors.content && (
-                <span className={styles.errorMessage}>{errors.content.message}</span>
-              )}
-            </div>
-          </>
-        );
-      
-      default:
-        return null;
-    }
-  };
 
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1>Создание нового урока</h1>
+          <h1>Создание нового курса</h1>
         </div>
 
         {error && <div className={styles.error}>{error}</div>}
 
-        <div className={styles.formCard}>
-          <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-            <div className={styles.formGroup}>
-              <label htmlFor="title">Название урока*</label>
-              <input
-                id="title"
-                type="text"
-                placeholder="Введите название урока"
-                {...register('title')}
-                className={styles.input}
-              />
-              {errors.title && (
-                <span className={styles.errorMessage}>{errors.title.message}</span>
-              )}
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="contentType">Тип контента*</label>
-              <select
-                id="contentType"
-                {...register('contentType')}
-                className={styles.select}
-              >
-                <option value={ContentType.TEXT}>Текст</option>
-                <option value={ContentType.VIDEO}>Видео</option>
-                <option value={ContentType.IMAGE}>Изображение</option>
-                <option value={ContentType.FILE}>Файл</option>
-                <option value={ContentType.EMBED}>Встраиваемый контент</option>
-              </select>
-            </div>
-
-            {/* Динамические поля в зависимости от типа контента */}
-            {renderContentFields()}
-
-            <div className={styles.formGroup}>
-              <label htmlFor="order">Порядок урока*</label>
-              <input
-                id="order"
-                type="number"
-                min="1"
-                step="1"
-                {...register('order')}
-                className={styles.input}
-              />
-              {errors.order && (
-                <span className={styles.errorMessage}>{errors.order.message}</span>
-              )}
-              <span className={styles.helperText}>
-                Последний урок имеет порядок: {maxOrder}
-              </span>
-            </div>
-
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                onClick={() => router.push(`/teacher/courses/${courseId}`)}
-                className={styles.cancelButton}
-                disabled={isSubmitting}
-              >
-                Отмена
-              </button>
-              <button
-                type="submit"
-                className={styles.submitButton}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Создание...' : 'Создать урок'}
-              </button>
-            </div>
-          </form>
+        <div className={styles.stepNavigation}>
+          <button
+            className={`${styles.stepItem} ${activeTab === 'course-info' ? styles.active : ''}`}
+            onClick={() => setActiveTab('course-info')}
+          >
+            Основная информация
+          </button>
+          <button
+            className={`${styles.stepItem} ${activeTab === 'lessons' ? styles.active : ''}`}
+            onClick={() => setActiveTab('lessons')}
+          >
+            Уроки
+          </button>
         </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          {activeTab === 'course-info' && (
+            <div className={styles.formCard}>
+              <div className={styles.formGroup}>
+                <label htmlFor="title">Название курса*</label>
+                <input
+                  id="title"
+                  type="text"
+                  {...register('title')}
+                  className={styles.input}
+                  placeholder="Введите название курса"
+                />
+                {errors.title && (
+                  <span className={styles.errorMessage}>
+                    {errors.title.message}
+                  </span>
+                )}
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="description">Описание курса*</label>
+                <textarea
+                  id="description"
+                  {...register('description')}
+                  className={styles.textarea}
+                  placeholder="Расскажите подробно о курсе"
+                  rows={6}
+                />
+                {errors.description && (
+                  <span className={styles.errorMessage}>
+                    {errors.description.message}
+                  </span>
+                )}
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="price">Цена курса (руб.)</label>
+                <input
+                  id="price"
+                  type="number"
+                  {...register('price')}
+                  className={styles.input}
+                  placeholder="0 (необязательно)"
+                  min="0"
+                  step="1"
+                />
+                {errors.price && (
+                  <span className={styles.errorMessage}>
+                    {errors.price.message}
+                  </span>
+                )}
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="imageUrl">URL обложки курса</label>
+                <input
+                  id="imageUrl"
+                  type="text"
+                  {...register('imageUrl')}
+                  className={styles.input}
+                  placeholder="https://example.com/course-image.jpg (необязательно)"
+                />
+                {errors.imageUrl && (
+                  <span className={styles.errorMessage}>
+                    {errors.imageUrl.message}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'lessons' && (
+            <div className={styles.formCard}>
+              <div className={styles.lessonsList}>
+                {watch('lessons')?.length === 0 ? (
+                  <p className={styles.emptyLessons}>
+                    У курса пока нет уроков. Добавьте первый!
+                  </p>
+                ) : (
+                  watch('lessons')?.map((lesson, index) => (
+                    <div key={index} className={styles.lessonItem}>
+                      <div className={styles.lessonInfo}>
+                        <span className={styles.lessonOrder}>{lesson.order}</span>
+                        <span className={styles.lessonTitle}>
+                          {lesson.title || 'Новый урок'}
+                        </span>
+                        <span className={styles.lessonType}>
+                          {lesson.contentType === ContentType.TEXT ? 'Текст' :
+                           lesson.contentType === ContentType.VIDEO ? 'Видео' :
+                           lesson.contentType === ContentType.IMAGE ? 'Изображение' :
+                           lesson.contentType === ContentType.FILE ? 'Файл' :
+                           lesson.contentType === ContentType.EMBED ? 'Встраиваемый контент' : 
+                           lesson.contentType}
+                        </span>
+                      </div>
+                      <div className={styles.lessonActions}>
+                        <button
+                          type="button"
+                          onClick={() => removeLesson(index)}
+                          className={styles.deleteButton}
+                        >
+                          Удалить
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className={styles.formActions}>
+                <button
+                  type="button"
+                  onClick={addLesson}
+                  className={styles.submitButton}
+                >
+                  Добавить урок
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className={styles.formActions}>
+            <button
+              type="button"
+              onClick={() => router.push('/teacher/dashboard')}
+              className={styles.cancelButton}
+              disabled={isSubmitting}
+            >
+              Отмена
+            </button>
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Создание...' : 'Создать курс'}
+            </button>
+          </div>
+        </form>
       </div>
     </Layout>
   );
