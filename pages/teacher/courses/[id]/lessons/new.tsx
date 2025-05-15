@@ -1,39 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import Layout from '../../../../../components/Layout';
 import { useAuthStore } from '../../../../../store/auth';
 import styles from '../../../../../styles/CourseForm.module.css';
-
-// Схема валидации формы
-const lessonSchema = z.object({
-  title: z.string().min(3, 'Название должно содержать не менее 3 символов'),
-  content: z.string().min(20, 'Содержание должно содержать не менее 20 символов'),
-  order: z.coerce.number().min(1, 'Порядок должен быть не менее 1').nonnegative('Порядок не может быть отрицательным')
-});
-
-type LessonFormData = z.infer<typeof lessonSchema>;
+import LessonEditor, { AnyContentBlock, ContentBlockType } from '../../../../../components/LessonEditor';
 
 export default function NewLesson() {
   const router = useRouter();
   const { id: courseId } = router.query;
   const { user, isLoading: authLoading } = useAuthStore();
   
+  const [title, setTitle] = useState('');
+  const [blocks, setBlocks] = useState<AnyContentBlock[]>([]);
+  const [order, setOrder] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [maxOrder, setMaxOrder] = useState(0);
   
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<LessonFormData>({
-    resolver: zodResolver(lessonSchema),
-    defaultValues: {
-      title: '',
-      content: '',
-      order: 1,
-    },
-  });
-
   // Проверка роли пользователя
   useEffect(() => {
     if (!authLoading && (!user || user.role !== 'TEACHER')) {
@@ -61,9 +43,7 @@ export default function NewLesson() {
           ? Math.max(...lessons.map((lesson: any) => lesson.order))
           : 0;
         
-        setMaxOrder(maxOrderValue);
-        // Устанавливаем порядок следующего урока
-        setValue('order', maxOrderValue + 1);
+        setOrder(maxOrderValue + 1);
       } catch (error) {
         console.error('Error fetching course:', error);
         setError('Произошла ошибка при загрузке информации о курсе');
@@ -73,21 +53,55 @@ export default function NewLesson() {
     if (courseId && user) {
       fetchCourse();
     }
-  }, [courseId, user, setValue]);
+  }, [courseId, user]);
 
-  const onSubmit = async (data: LessonFormData) => {
+  const handleLessonChange = (updatedBlocks: AnyContentBlock[]) => {
+    setBlocks(updatedBlocks);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!title.trim()) {
+      setError('Название урока обязательно');
+      return;
+    }
+
     if (!courseId) return;
     
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // Подготовка содержимого урока в формате JSON
+      const contentJson = JSON.stringify(blocks);
+      
+      // Создание базового текста контента для API
+      // Это упрощенное представление для совместимости с существующим API
+      const content = blocks.map(block => {
+        switch (block.type) {
+          case ContentBlockType.TEXT:
+            return block.content;
+          case ContentBlockType.VIDEO:
+            return `[VIDEO: ${block.url}]\n${block.description || ''}`;
+          case ContentBlockType.IMAGE:
+            return `[IMAGE: ${block.url}]\n${block.caption || ''}`;
+          default:
+            return block.title || '';
+        }
+      }).join('\n\n');
+
       const response = await fetch(`/api/teacher/courses/${courseId}/lessons`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          title,
+          content,
+          contentJson, // Добавляем структурированный контент
+          order,
+        }),
       });
 
       const result = await response.json();
@@ -122,34 +136,19 @@ export default function NewLesson() {
 
         {error && <div className={styles.error}>{error}</div>}
 
-        <div className={styles.formCard}>
-          <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formCard}>
             <div className={styles.formGroup}>
               <label htmlFor="title">Название урока*</label>
               <input
                 id="title"
                 type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="Введите название урока"
-                {...register('title')}
                 className={styles.input}
+                required
               />
-              {errors.title && (
-                <span className={styles.errorMessage}>{errors.title.message}</span>
-              )}
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="content">Содержание урока*</label>
-              <textarea
-                id="content"
-                placeholder="Введите содержание урока"
-                {...register('content')}
-                className={styles.textarea}
-                rows={10}
-              />
-              {errors.content && (
-                <span className={styles.errorMessage}>{errors.content.message}</span>
-              )}
             </div>
 
             <div className={styles.formGroup}>
@@ -159,36 +158,44 @@ export default function NewLesson() {
                 type="number"
                 min="1"
                 step="1"
-                {...register('order')}
+                value={order}
+                onChange={(e) => setOrder(parseInt(e.target.value))}
                 className={styles.input}
               />
-              {errors.order && (
-                <span className={styles.errorMessage}>{errors.order.message}</span>
-              )}
-              <span className={styles.helperText}>
-                Последний урок имеет порядок: {maxOrder}
-              </span>
+              <p className={styles.helperText}>
+                Определяет позицию урока в списке (чем меньше число, тем раньше отображается урок)
+              </p>
             </div>
+          </div>
+          
+          <div className={styles.editorSection}>
+            <h2>Содержимое урока</h2>
+            <div className={styles.editorContainer}>
+              <LessonEditor
+                initialBlocks={blocks}
+                onChange={handleLessonChange}
+              />
+            </div>
+          </div>
 
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                onClick={() => router.push(`/teacher/courses/${courseId}`)}
-                className={styles.cancelButton}
-                disabled={isSubmitting}
-              >
-                Отмена
-              </button>
-              <button
-                type="submit"
-                className={styles.submitButton}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Создание...' : 'Создать урок'}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className={styles.formActions}>
+            <button
+              type="button"
+              onClick={() => router.push(`/teacher/courses/${courseId}`)}
+              className={styles.cancelButton}
+              disabled={isSubmitting}
+            >
+              Отмена
+            </button>
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Создание...' : 'Создать урок'}
+            </button>
+          </div>
+        </form>
       </div>
     </Layout>
   );

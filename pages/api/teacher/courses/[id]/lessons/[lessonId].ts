@@ -74,7 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // PATCH запрос - обновление данных урока
   else if (req.method === 'PATCH') {
     try {
-      const { title, content, order } = req.body;
+      const { title, content, order, contentJson } = req.body;
       
       const updateData: any = {};
       
@@ -82,6 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (title !== undefined) updateData.title = title;
       if (content !== undefined) updateData.content = content;
       if (order !== undefined) updateData.order = Number(order);
+      if (contentJson !== undefined) updateData.contentJson = contentJson;
       
       // Если нет данных для обновления
       if (Object.keys(updateData).length === 0) {

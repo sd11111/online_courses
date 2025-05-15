@@ -1,0 +1,498 @@
+.editorContainer {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    overflow: hidden;
+    min-height: 600px;
+  }
+  
+  .blockToolbar {
+    width: 250px;
+    flex-shrink: 0;
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 1rem;
+  }
+  
+  .blockToolbar h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: #333;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .blockTypes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .blockType {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: #f5f7fa;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .blockType:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .blockTypeIcon {
+    font-size: 1.2rem;
+    margin-right: 0.75rem;
+  }
+  
+  .blockTypeName {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4b5563;
+  }
+  
+  .editorWorkspace {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+  
+  .blocksContainer {
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    flex: 1;
+  }
+  
+  .blocksContainer h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: #333;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .emptyBlocks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background-color: #f9fafb;
+    border: 2px dashed #e5e7eb;
+    border-radius: 6px;
+    color: #6b7280;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .blocksList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .blockItem {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .blockItem:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .blockItem.activeBlock {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+  }
+  
+  .blockHeader {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #f5f7fa;
+  }
+  
+  .blockTypeIndicator {
+    display: flex;
+    align-items: center;
+    background-color: #e5e7eb;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    font-size: 0.8rem;
+    color: #4b5563;
+  }
+  
+  .blockTypeIndicator .blockTypeIcon {
+    margin-right: 0.4rem;
+    font-size: 1rem;
+  }
+  
+  .blockTitle {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .blockActions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .removeBlockButton {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+  
+  .removeBlockButton:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
+  }
+  
+  .dropIndicator {
+    height: 2px;
+    background-color: #3b82f6;
+    margin: 0.5rem 0;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  }
+  
+  .blockEditorContainer {
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .blockEditorContainer h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: #333;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .blockEditor {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .blockTitle {
+    font-size: 1rem;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    width: 100%;
+  }
+  
+  .blockTitle:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  .textContent, 
+  .description, 
+  .embedCode, 
+  .instructions, 
+  .codeEditor {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+  }
+  
+  .textContent:focus, 
+  .description:focus, 
+  .embedCode:focus, 
+  .instructions:focus, 
+  .codeEditor:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  .codeEditor {
+    font-family: monospace;
+    background-color: #f3f4f6;
+  }
+  
+  .urlInput, 
+  .fileName, 
+  .fileSize, 
+  .caption {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+  }
+  
+  .urlInput:focus, 
+  .fileName:focus, 
+  .fileSize:focus, 
+  .caption:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  .videoPreview, 
+  .imagePreview {
+    width: 100%;
+    margin: 0.5rem 0;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .videoPreview iframe {
+    width: 100%;
+    height: 300px;
+  }
+  
+  .imagePreview img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+  }
+  
+  .questionList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .questionItem {
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .questionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .questionHeader h4 {
+    margin: 0;
+    color: #374151;
+  }
+  
+  .questionText {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  .questionText:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  .optionsList {
+    margin-top: 1rem;
+  }
+  
+  .optionsList h5 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: #4b5563;
+    font-size: 0.9rem;
+  }
+  
+  .optionItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .optionInput {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+  
+  .optionInput input[type="radio"] {
+    margin-right: 0.5rem;
+  }
+  
+  .optionInput input[type="text"] {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+  }
+  
+  .optionInput input[type="text"]:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  .removeOptionButton {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    margin-left: 0.5rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+  
+  .removeOptionButton:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
+  }
+  
+  .addButton {
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+  }
+  
+  .addButton:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .removeButton {
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #ef4444;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .removeButton:hover {
+    background-color: #fecaca;
+  }
+  
+  .codeSettings {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .languageSelect {
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    background-color: white;
+  }
+  
+  .languageSelect:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  .assignmentSettings {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .settingField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 150px;
+  }
+  
+  .settingField label {
+    font-size: 0.85rem;
+    color: #4b5563;
+  }
+  
+  .settingField input {
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+  }
+  
+  .settingField input:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  @media (max-width: 1024px) {
+    .editorContainer {
+      flex-direction: column;
+    }
+    
+    .blockToolbar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .blockTypes {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .blockHeader {
+      flex-wrap: wrap;
+    }
+    
+    .blockTypeIndicator {
+      margin-bottom: 0.5rem;
+    }
+    
+    .assignmentSettings {
+      flex-direction: column;
+    }
+  }

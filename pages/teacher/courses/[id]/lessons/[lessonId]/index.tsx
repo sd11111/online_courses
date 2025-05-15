@@ -1,51 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import Layout from '../../../../../../components/Layout';
 import { useAuthStore } from '../../../../../../store/auth';
 import styles from '../../../../../../styles/CourseForm.module.css';
-
-// Типы данных
-type Lesson = {
-  id: string;
-  title: string;
-  content: string;
-  order: number;
-  courseId: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-// Схема валидации формы
-const lessonSchema = z.object({
-  title: z.string().min(3, 'Название должно содержать не менее 3 символов'),
-  content: z.string().min(20, 'Содержание должно содержать не менее 20 символов'),
-  order: z.coerce.number().min(1, 'Порядок должен быть не менее 1').nonnegative('Порядок не может быть отрицательным')
-});
-
-type LessonFormData = z.infer<typeof lessonSchema>;
+import LessonEditor, { AnyContentBlock, ContentBlockType, TextBlock } from '../../../../../../components/LessonEditor';
 
 export default function EditLesson() {
   const router = useRouter();
   const { id: courseId, lessonId } = router.query;
   const { user, isLoading: authLoading } = useAuthStore();
   
-  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [title, setTitle] = useState('');
+  const [blocks, setBlocks] = useState<AnyContentBlock[]>([]);
+  const [order, setOrder] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<LessonFormData>({
-    resolver: zodResolver(lessonSchema),
-    defaultValues: {
-      title: '',
-      content: '',
-      order: 1,
-    },
-  });
-
   // Проверка роли пользователя
   useEffect(() => {
     if (!authLoading && (!user || user.role !== 'TEACHER')) {
@@ -69,14 +40,44 @@ export default function EditLesson() {
         }
 
         const data = await response.json();
-        setLesson(data.lesson);
+        const lesson = data.lesson;
         
-        // Заполняем форму данными урока
-        reset({
-          title: data.lesson.title,
-          content: data.lesson.content,
-          order: data.lesson.order,
-        });
+        setTitle(lesson.title);
+        setOrder(lesson.order);
+
+        // Попытка загрузить структурированное содержимое
+        let contentBlocks: AnyContentBlock[] = [];
+        
+        try {
+          if (lesson.contentJson) {
+            // Если есть структурированное содержимое в JSON, используем его
+            contentBlocks = JSON.parse(lesson.contentJson);
+          } else {
+            // Иначе создаем простой текстовый блок из существующего содержимого
+            contentBlocks = [
+              {
+                id: 'legacy-content',
+                type: ContentBlockType.TEXT,
+                order: 0,
+                title: 'Содержимое урока',
+                content: lesson.content || '',
+              } as TextBlock,
+            ];
+          }
+        } catch (e) {
+          // В случае ошибки парсинга, создаем простой текстовый блок
+          contentBlocks = [
+            {
+              id: 'legacy-content',
+              type: ContentBlockType.TEXT,
+              order: 0,
+              title: 'Содержимое урока',
+              content: lesson.content || '',
+            } as TextBlock,
+          ];
+        }
+        
+        setBlocks(contentBlocks);
       } catch (error) {
         console.error('Error fetching lesson:', error);
         setError('Произошла ошибка при загрузке урока');
@@ -88,22 +89,54 @@ export default function EditLesson() {
     if (courseId && lessonId && user) {
       fetchLesson();
     }
-  }, [courseId, lessonId, user, reset]);
+  }, [courseId, lessonId, user]);
 
-  // Обработка отправки формы
-  const onSubmit = async (data: LessonFormData) => {
+  const handleLessonChange = (updatedBlocks: AnyContentBlock[]) => {
+    setBlocks(updatedBlocks);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!title.trim()) {
+      setError('Название урока обязательно');
+      return;
+    }
+
     if (!courseId || !lessonId) return;
     
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // Подготовка содержимого урока в формате JSON
+      const contentJson = JSON.stringify(blocks);
+      
+      // Создание базового текста контента для совместимости с API
+      const content = blocks.map(block => {
+        switch (block.type) {
+          case ContentBlockType.TEXT:
+            return block.content;
+          case ContentBlockType.VIDEO:
+            return `[VIDEO: ${block.url}]\n${block.description || ''}`;
+          case ContentBlockType.IMAGE:
+            return `[IMAGE: ${block.url}]\n${block.caption || ''}`;
+          default:
+            return block.title || '';
+        }
+      }).join('\n\n');
+
       const response = await fetch(`/api/teacher/courses/${courseId}/lessons/${lessonId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          title,
+          content,
+          contentJson,
+          order,
+        }),
       });
 
       const result = await response.json();
@@ -112,15 +145,14 @@ export default function EditLesson() {
         throw new Error(result.error || 'Не удалось обновить урок');
       }
 
-      // Обновляем данные урока
-      setLesson(result.lesson);
-
       // Показываем сообщение об успешном сохранении
       alert('Урок успешно обновлен');
+      
+      // Перенаправляем на страницу редактирования курса
+      router.push(`/teacher/courses/${courseId}`);
     } catch (error) {
       console.error('Error updating lesson:', error);
       setError((error as Error).message);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -155,19 +187,15 @@ export default function EditLesson() {
   };
 
   if (authLoading || isLoading) {
-    return <div>Загрузка...</div>;
+    return (
+      <Layout>
+        <div className={styles.loading}>Загрузка...</div>
+      </Layout>
+    );
   }
 
   if (!user || user.role !== 'TEACHER') {
     return null; // Router will redirect
-  }
-
-  if (!lesson) {
-    return (
-      <Layout>
-        <div>Урок не найден</div>
-      </Layout>
-    );
   }
 
   return (
@@ -179,6 +207,7 @@ export default function EditLesson() {
             onClick={deleteLesson}
             className={styles.deleteButton}
             disabled={isSubmitting}
+            type="button"
           >
             Удалить урок
           </button>
@@ -186,34 +215,19 @@ export default function EditLesson() {
 
         {error && <div className={styles.error}>{error}</div>}
 
-        <div className={styles.formCard}>
-          <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formCard}>
             <div className={styles.formGroup}>
               <label htmlFor="title">Название урока*</label>
               <input
                 id="title"
                 type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="Введите название урока"
-                {...register('title')}
                 className={styles.input}
+                required
               />
-              {errors.title && (
-                <span className={styles.errorMessage}>{errors.title.message}</span>
-              )}
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="content">Содержание урока*</label>
-              <textarea
-                id="content"
-                placeholder="Введите содержание урока"
-                {...register('content')}
-                className={styles.textarea}
-                rows={10}
-              />
-              {errors.content && (
-                <span className={styles.errorMessage}>{errors.content.message}</span>
-              )}
             </div>
 
             <div className={styles.formGroup}>
@@ -223,33 +237,44 @@ export default function EditLesson() {
                 type="number"
                 min="1"
                 step="1"
-                {...register('order')}
+                value={order}
+                onChange={(e) => setOrder(parseInt(e.target.value))}
                 className={styles.input}
               />
-              {errors.order && (
-                <span className={styles.errorMessage}>{errors.order.message}</span>
-              )}
+              <p className={styles.helperText}>
+                Определяет позицию урока в списке (чем меньше число, тем раньше отображается урок)
+              </p>
             </div>
+          </div>
+          
+          <div className={styles.editorSection}>
+            <h2>Содержимое урока</h2>
+            <div className={styles.editorContainer}>
+              <LessonEditor
+                initialBlocks={blocks}
+                onChange={handleLessonChange}
+              />
+            </div>
+          </div>
 
-            <div className={styles.formActions}>
-              <button
-                type="button"
-                onClick={() => router.push(`/teacher/courses/${courseId}`)}
-                className={styles.cancelButton}
-                disabled={isSubmitting}
-              >
-                Назад
-              </button>
-              <button
-                type="submit"
-                className={styles.submitButton}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Сохранение...' : 'Сохранить изменения'}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className={styles.formActions}>
+            <button
+              type="button"
+              onClick={() => router.push(`/teacher/courses/${courseId}`)}
+              className={styles.cancelButton}
+              disabled={isSubmitting}
+            >
+              Отмена
+            </button>
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Сохранение...' : 'Сохранить изменения'}
+            </button>
+          </div>
+        </form>
       </div>
     </Layout>
   );
