@@ -44,7 +44,7 @@ model Lesson {
   id          String   @id @default(uuid())
   title       String
   content     String   @db.Text
-  contentJson String?  @db.Text // Добавлено новое поле для структурированного контента
+  contentJson String?  @db.Text // Структурированное содержимое в формате JSON
   contentType ContentType @default(TEXT)
   mediaUrl    String?   // Ссылка на видео, изображение или другой медиа-контент
   order       Int

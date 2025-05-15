@@ -74,15 +74,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // PATCH запрос - обновление данных урока
   else if (req.method === 'PATCH') {
     try {
-      const { title, content, order, contentJson } = req.body;
+      const { title, content, contentJson, order } = req.body;
       
+      // Создаем объект обновления, используя any для обхода типизации
       const updateData: any = {};
       
       // Обновляем только те поля, которые пришли в запросе
       if (title !== undefined) updateData.title = title;
       if (content !== undefined) updateData.content = content;
-      if (order !== undefined) updateData.order = Number(order);
       if (contentJson !== undefined) updateData.contentJson = contentJson;
+      if (order !== undefined) updateData.order = Number(order);
       
       // Если нет данных для обновления
       if (Object.keys(updateData).length === 0) {
